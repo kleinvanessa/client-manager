@@ -1,4 +1,7 @@
 
+using ClientManager.Backend.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace ClientManager.Backend
 {
     public class Program
@@ -13,6 +16,10 @@ namespace ClientManager.Backend
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // DbContext with SQL Server
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
