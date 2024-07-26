@@ -1,0 +1,23 @@
+# Gitignore
+
+# Backend (.NET Core)
+bin
+obj
+.user
+.rsuser
+.idea/
+
+# General
+*.log
+
+
+# IDE/editor directories
+.vs/
+
+# File layout Visual Studio
+DocumentLayout.json
+
+# temp file
+
+*.tmp
+*.swp
