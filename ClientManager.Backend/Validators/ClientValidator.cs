@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using ClientManager.Backend.Entities;
 using ClientManager.Backend.Enums;
 using System.Text.RegularExpressions;
+using ClientManager.Backend.DTOs;
 
 namespace ClientManager.Backend.Validators
 {
-    public class ClientValidator : AbstractValidator<Client>
+    public class ClientValidator : AbstractValidator<ClientDTO>
     {
         public ClientValidator()
         {
@@ -36,7 +36,6 @@ namespace ClientManager.Backend.Validators
                 .NotEmpty().WithMessage("Inscrição Estadual é obrigatória.")
                 .When(client => client.ClientType == ClientType.Corporate ||
                                 (client.ClientType == ClientType.Individual && !client.IsStateRegistrationExempt))
-                .Matches(@"^\d{3}\.\d{3}\.\d{3}\-\d{3}$").WithMessage("Inscrição Estadual deve seguir o formato ###.###.###-###.")
                 .When(client => !client.IsStateRegistrationExempt);
 
             RuleFor(client => client.Gender)
@@ -46,6 +45,18 @@ namespace ClientManager.Backend.Validators
             RuleFor(client => client.BirthDate)
                 .NotNull().WithMessage("Data de Nascimento é obrigatória para Pessoa Física.")
                 .When(client => client.ClientType == ClientType.Individual);
+
+            RuleFor(client => client.Gender)
+                .Null().WithMessage("Gênero deve ser nulo para Pessoa Jurídica.")
+                .When(client => client.ClientType == ClientType.Corporate);
+
+            RuleFor(client => client.BirthDate)
+                .Null().WithMessage("Data de Nascimento deve ser nula para Pessoa Jurídica.")
+                .When(client => client.ClientType == ClientType.Corporate);
+
+            RuleFor(client => client.IsStateRegistrationExempt)
+                .Equal(false).WithMessage("IsStateRegistrationExempt deve ser falso para Pessoa Jurídica.")
+                .When(client => client.ClientType == ClientType.Corporate);
 
             // Validação da área de Senha de Acesso
             RuleFor(client => client.Password)
@@ -69,28 +80,14 @@ namespace ClientManager.Backend.Validators
 
             if (clientType == ClientType.Individual)
             {
-                return cleanCpfCnpj.Length == 11 && IsValidCpf(cleanCpfCnpj);
+                return cleanCpfCnpj.Length == 11;
             }
             else if (clientType == ClientType.Corporate)
             {
-                return cleanCpfCnpj.Length == 14 && IsValidCnpj(cleanCpfCnpj);
+                return cleanCpfCnpj.Length == 14;
             }
 
             return false;
-        }
-
-        private bool IsValidCpf(string cpf)
-        {
-            // Verifica o formato do CPF com máscara ###.###.###-##
-            string cpfWithMask = Regex.Replace(cpf, @"(\d{3})(\d{3})(\d{3})(\d{2})", "$1.$2.$3-$4");
-            return Regex.IsMatch(cpfWithMask, @"^\d{3}\.\d{3}\.\d{3}\-\d{2}$");
-        }
-
-        private bool IsValidCnpj(string cnpj)
-        {
-            // Verifica o formato do CNPJ com máscara ##.###.###/####-##
-            string cnpjWithMask = Regex.Replace(cnpj, @"(\d{2})(\d{3})(\d{3})/(\d{4})(\d{2})", "$1.$2.$3/$4-$5");
-            return Regex.IsMatch(cnpjWithMask, @"^\d{2}\.\d{3}\.\d{3}/\d{4}\-\d{2}$");
         }
     }
 }

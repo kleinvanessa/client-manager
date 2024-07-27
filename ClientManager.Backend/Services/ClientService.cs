@@ -17,6 +17,11 @@ namespace ClientManager.Backend.Services
             return await _clientRepository.GetAll();
         }
 
+        public async Task<Client> GetById(int id)
+        {
+            return await _clientRepository.GetById(id);
+        }
+
         public async Task UpsertClient(Client client)
         {
             await ValidateClientUniqueFieldsValues(client);
@@ -42,22 +47,30 @@ namespace ClientManager.Backend.Services
         }
 
         private async Task ValidateClientUniqueFieldsValues(Client client)
-        {            
-
-            if (await _clientRepository.EmailExists(client.Email) != client.Id)
+        {
+            if (await _clientRepository.EmailExists(client.Email) != null)
             {
-                throw new ArgumentException("The email is already linked to another client.");
+                if ((await _clientRepository.EmailExists(client.Email)).Id != client.Id)
+                {
+                    throw new ArgumentException("O e-mail já está vinculado a outro cliente.");
+                }                
             }
 
-            if (await _clientRepository.CpfCnpjExists(client.CpfCnpj) != client.Id)
+            if (await _clientRepository.CpfCnpjExists(client.CpfCnpj) != null)
             {
-                throw new ArgumentException("The CPF/CNPJ is already linked to another client.");
+                if((await _clientRepository.CpfCnpjExists(client.CpfCnpj)).Id != client.Id)
+                {
+                    throw new ArgumentException("O CPF/CNPJ já está vinculado a outro cliente.");
+                }
             }
 
             if (!client.IsStateRegistrationExempt && !string.IsNullOrEmpty(client.StateRegistration) &&
-                await _clientRepository.StateRegistrationExists(client.StateRegistration) != client.Id)
+                 await _clientRepository.StateRegistrationExists(client.StateRegistration) != null)
             {
-                throw new ArgumentException("The State Registration is already linked to another client.");
+                if((await _clientRepository.StateRegistrationExists(client.StateRegistration)).Id != client.Id)
+                {
+                    throw new ArgumentException("O Registro Estadual já está vinculado a outro cliente.");
+                }                
             }
         }
 

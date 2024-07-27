@@ -13,28 +13,25 @@ namespace ClientManager.Backend.Repositories
             _context = context;
         }
 
-        public async Task<int> EmailExists(string email)
+        public async Task<Client?> EmailExists(string email)
         {
             return await _context.Clients
-            .Where(c => c.Email == email)
-            .Select(c => c.Id)
-            .FirstOrDefaultAsync();
+                .Where(c => c.Email == email)
+                .FirstOrDefaultAsync();
         }
 
-        public async Task<int> CpfCnpjExists(string cpfCnpj)
+        public async Task<Client?> CpfCnpjExists(string cpfCnpj)
         {
             return await _context.Clients
-            .Where(c => c.CpfCnpj == cpfCnpj)
-            .Select(c => c.Id)
-            .FirstOrDefaultAsync();
+               .Where(c => c.CpfCnpj == cpfCnpj)
+               .FirstOrDefaultAsync();
         }
 
-        public async Task<int> StateRegistrationExists(string stateRegistration)
+        public async Task<Client?> StateRegistrationExists(string stateRegistration)
         {
             return await _context.Clients
-            .Where(c => c.StateRegistration == stateRegistration)
-            .Select(c => c.Id)
-            .FirstOrDefaultAsync();
+               .Where(c => c.StateRegistration == stateRegistration)
+               .FirstOrDefaultAsync();
         }
 
         public async Task<Client> GetById(int id)

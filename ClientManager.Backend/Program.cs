@@ -1,5 +1,8 @@
 
 using ClientManager.Backend.Data;
+using ClientManager.Backend.Mapping;
+using ClientManager.Backend.Repositories;
+using ClientManager.Backend.Services;
 using ClientManager.Backend.Validators;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +18,20 @@ namespace ClientManager.Backend
             // Add services to the container.
 
             builder.Services.AddControllers()
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ClientValidator>()); ;
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<ClientValidator>());
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Register AutoMapper
+            builder.Services.AddAutoMapper(typeof(ClientProfile).Assembly);
+
+            // Services
+            builder.Services.AddScoped<IClientService, ClientService>();
+
+            // Repositories
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
             // DbContext with SQL Server
             builder.Services.AddDbContext<AppDbContext>(options =>

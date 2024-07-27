@@ -4,9 +4,9 @@ namespace ClientManager.Backend.Repositories
 {
     public interface IClientRepository
     {
-        Task<int> EmailExists(string email);
-        Task<int> CpfCnpjExists(string cpfCnpj);
-        Task<int> StateRegistrationExists(string stateRegistration);
+        Task<Client?> EmailExists(string email);
+        Task<Client?> CpfCnpjExists(string cpfCnpj);
+        Task<Client?> StateRegistrationExists(string stateRegistration);
         Task<Client> GetById(int id);
         Task<IEnumerable<Client>> GetAll();
         Task Add(Client client);
