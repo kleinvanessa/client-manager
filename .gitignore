@@ -9,10 +9,13 @@ obj
 
 # General
 *.log
-
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # IDE/editor directories
 .vs/
+.vscode/
 
 # File layout Visual Studio
 DocumentLayout.json
@@ -21,3 +24,26 @@ DocumentLayout.json
 
 *.tmp
 *.swp
+
+# Frontend (React)
+node_modules
+.env
+.env.*.local
+build/
+.DS_Store
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# TypeScript cache (if using TypeScript)
+*.tsbuildinfo
+
+# 
+applicationhost.config
+.suo
+
+# File layout Visual Studio
+DocumentLayout.json
+
+
