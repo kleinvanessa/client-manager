@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchClients, removeClient } from '../services/clientService';
-import { Container, Row, Col, Button, Form } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, Dropdown, DropdownButton } from 'react-bootstrap';
+import { FaFilter } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import ClientTable from './ClientTable';
 import PaginationComponent from './PaginationComponent';
@@ -16,6 +17,8 @@ function ClientList() {
   const [clientNameToDelete, setClientNameToDelete] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
 
   useEffect(() => {
     fetchClientsList();
@@ -56,10 +59,24 @@ function ClientList() {
     setSearchTerm(e.target.value);
   };
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSort = (field, order) => {
+    setSortField(field);
+    setSortOrder(order);
+  };
+
+  const sortedClients = [...clients].sort((a, b) => {
+    if (sortField === 'name') {
+      return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+    } else if (sortField === 'registrationDate') {
+      return sortOrder === 'asc' ? new Date(a.registrationDate) - new Date(b.registrationDate) : new Date(b.registrationDate) - new Date(a.registrationDate);
+    }
+    return 0;
+  });
+
+  const filteredClients = sortedClients.filter(client => {
+    const matchesSearchTerm = client.name.toLowerCase().includes(searchTerm.toLowerCase()) || client.email.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearchTerm;
+  });
 
   const indexOfLastClient = currentPage * clientsPerPage;
   const indexOfFirstClient = indexOfLastClient - clientsPerPage;
@@ -75,8 +92,23 @@ function ClientList() {
         </Col>
       </Row>
       <Row className="mb-3">
+        <Col className="d-flex justify-content-start align-items-center">
+          <DropdownButton id="dropdown-basic-button" title="Ordenar" className="mr-3">
+            <Dropdown.Item onClick={() => handleSort('name', 'asc')}>Nome (A-Z)</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleSort('name', 'desc')}>Nome (Z-A)</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleSort('registrationDate', 'asc')}>Data de Cadastro (Crescente)</Dropdown.Item>
+            <Dropdown.Item onClick={() => handleSort('registrationDate', 'desc')}>Data de Cadastro (Decrescente)</Dropdown.Item>
+          </DropdownButton>
+          <Button 
+            variant="link" 
+            onClick={handleFilterToggle} 
+            className="p-0" 
+            style={{ boxShadow: 'none', marginLeft: '1.5rem' }} // Aumenta o espaçamento e remove a borda
+          >
+            <FaFilter size={20} style={{ color: '#6c757d' }} /> {/* Cor cinza mais suave */}
+          </Button>
+        </Col>
         <Col className="d-flex justify-content-end">
-          <Button variant="info" onClick={handleFilterToggle} className="mr-2">Filtrar</Button>
           <Link to="/add-client" className="btn btn-primary">Adicionar Cliente</Link>
         </Col>
       </Row>
