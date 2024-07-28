@@ -7,6 +7,7 @@ import PersonalInfoArea from './PersonalInfoArea';
 import ClientStatusArea from './ClientStatusArea';
 import PasswordArea from './PasswordArea';
 import '../styles.css';
+import { addClient } from '../services/clientService';
 
 function ClientForm() {
   const [formData, setFormData] = useState({
@@ -70,13 +71,47 @@ function ClientForm() {
     return Object.keys(newErrors).length === 0;
   };  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (validateForm()) {
-      // chamar serviço de adiçao de cliente
-      navigate('/');
+      const formattedData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone.replace(/\D/g, ''), 
+        clientType: parseInt(formData.personType, 10), 
+        cpfCnpj: formData.cpfCnpj.replace(/\D/g, ''),
+        stateRegistration: formData.stateRegistration ? formData.stateRegistration.replace(/\D/g, '') : null,
+        isStateRegistrationExempt: formData.exemptStateRegistration,
+        gender: formData.gender ? parseInt(formData.gender, 10) : null,
+        birthDate: formData.birthDate ? new Date(formData.birthDate).toISOString().split('T')[0] : null,
+        isBlocked: formData.isBlocked,
+        password: formData.password
+      };
+  
+      try {
+        await addClient(formattedData);
+        navigate('/');
+      } catch (error) {
+        const errorMessage = error.response?.data || 'Erro desconhecido ao adicionar cliente.';
+  
+        const newErrors = {};
+  
+        if (errorMessage.includes('e-mail')) {
+          newErrors.email = 'O e-mail já está vinculado a outro cliente.';
+        }
+        if (errorMessage.includes('CPF/CNPJ')) {
+          newErrors.cpfCnpj = 'O CPF/CNPJ já está vinculado a outro cliente.';
+        }
+        if (errorMessage.includes('Registro Estadual')) {
+          newErrors.stateRegistration = 'O Registro Estadual já está vinculado a outro cliente.';
+        }
+  
+        setErrors(newErrors);
+      }
     }
   };
+  
 
   const handleClear = () => {
     setFormData({
@@ -111,6 +146,10 @@ function ClientForm() {
             <Button type="submit" variant="primary">Adicionar Cliente</Button>
             <Button type="button" variant="secondary" onClick={handleClear} className="ml-3">Limpar</Button>
         </div>
+        {errors.email && <div className="alert alert-danger mt-3">{errors.email}</div>}
+        {errors.cpfCnpj && <div className="alert alert-danger mt-3">{errors.cpfCnpj}</div>}
+        {errors.stateRegistration && <div className="alert alert-danger mt-3">{errors.stateRegistration}</div>}
+        {errors.form && !errors.email && !errors.cpfCnpj && !errors.stateRegistration && <div className="alert alert-danger mt-3">{errors.form}</div>}
       </Form>
     </Container>
   );
