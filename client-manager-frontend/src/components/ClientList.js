@@ -107,6 +107,7 @@ function ClientList() {
             setClientIdToDelete={(id, name) => { setClientIdToDelete(id); setClientNameToDelete(name); }}
             setShowModal={setShowModal}
             setClientNameToDelete={setClientNameToDelete}
+            fetchClientsList={fetchClientsList}
           />
         </Col>
       </Row>
