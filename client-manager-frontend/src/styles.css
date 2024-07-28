@@ -1,0 +1,21 @@
+.section-title {
+    margin-top: 2rem;
+  }
+  
+  .margin-bottom {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    color: #007bff;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .button-group .btn {
+    flex: 1;
+  }
+  
