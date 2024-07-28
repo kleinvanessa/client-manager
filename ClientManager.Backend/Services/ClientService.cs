@@ -1,5 +1,4 @@
 ﻿using ClientManager.Backend.Entities;
-using ClientManager.Backend.Enums;
 using ClientManager.Backend.Repositories;
 
 namespace ClientManager.Backend.Services

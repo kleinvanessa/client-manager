@@ -3,7 +3,6 @@ using ClientManager.Backend.DTOs;
 using ClientManager.Backend.Entities;
 using ClientManager.Backend.Services;
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientManager.Backend.Controllers
