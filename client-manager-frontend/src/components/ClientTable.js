@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { formatPhoneNumber, formatDate } from '../utils/formatters';
 import BlockUnblockModal from './BlockUnblockModal';
 import { editClient } from '../services/clientService';
@@ -11,6 +11,7 @@ function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, 
   const [clientIdToBlockUnblock, setClientIdToBlockUnblock] = useState(null);
   const [clientNameToBlockUnblock, setClientNameToBlockUnblock] = useState('');
   const [isBlockedStatus, setIsBlockedStatus] = useState(false);
+  const navigate = useNavigate();
 
   const handleBlockUnblock = (client) => {
     setClientIdToBlockUnblock(client.id);
@@ -29,6 +30,10 @@ function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, 
     } finally {
       setShowBlockUnblockModal(false);
     }
+  };
+
+  const handleEdit = (client) => {
+    navigate(`/edit-client/${client.id}`, { state: { client } });
   };
 
   return (
@@ -71,13 +76,14 @@ function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, 
                 />
               </td>
               <td>
-                <Link 
-                  to={`/edit-client/${client.id}`} 
+                <Button 
+                  variant="link" 
+                  onClick={() => handleEdit(client)} 
                   className="p-0" 
                   style={{ color: '#007bff', marginRight: '1rem' }}
                 >
                   <FaEdit size={20} />
-                </Link>
+                </Button>
                 <Button 
                   variant="link" 
                   onClick={() => { 

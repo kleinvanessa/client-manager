@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Form, Button, Container } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
 import MainArea from './MainArea';
@@ -7,26 +7,31 @@ import PersonalInfoArea from './PersonalInfoArea';
 import ClientStatusArea from './ClientStatusArea';
 import PasswordArea from './PasswordArea';
 import '../styles.css';
-import { addClient } from '../services/clientService';
+import { addClient, editClient } from '../services/clientService';
 
 function ClientForm() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const clientData = location.state?.client || {};
+  
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    personType: '',
-    cpfCnpj: '',
-    stateRegistration: '',
-    exemptStateRegistration: false,
-    gender: '',
-    birthDate: '',
-    isBlocked: false,
-    password: '',
-    confirmPassword: ''
+    name: clientData.name || '',
+    email: clientData.email || '',
+    phone: clientData.phone || '',
+    personType: clientData.clientType?.toString() || '',
+    cpfCnpj: clientData.cpfCnpj || '',
+    stateRegistration: clientData.stateRegistration || '',
+    exemptStateRegistration: clientData.isStateRegistrationExempt || false,
+    gender: clientData.gender?.toString() || '',
+    birthDate: clientData.birthDate ? new Date(clientData.birthDate).toISOString().split('T')[0] : '',
+    isBlocked: clientData.isBlocked || false,
+    password: clientData.password,
+    confirmPassword: clientData.password
   });
   
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+  const isEditMode = !!clientData.id;
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
@@ -69,7 +74,7 @@ function ClientForm() {
   
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };  
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,10 +95,14 @@ function ClientForm() {
       };
   
       try {
-        await addClient(formattedData);
+        if (isEditMode) {
+          await editClient(clientData.id, formattedData);
+        } else {
+          await addClient(formattedData);
+        }
         navigate('/');
       } catch (error) {
-        const errorMessage = error.response?.data || 'Erro desconhecido ao adicionar cliente.';
+        const errorMessage = error.response?.data || 'Erro desconhecido ao salvar cliente.';
   
         const newErrors = {};
   
@@ -112,7 +121,6 @@ function ClientForm() {
     }
   };
   
-
   const handleClear = () => {
     setFormData({
       name: '',
@@ -136,15 +144,15 @@ function ClientForm() {
       <Button variant="link" onClick={() => navigate('/')} className="mb-3">
         <FaArrowLeft /> Voltar
       </Button>
-      <h1 className="mb-4 page-title">Adicionar Cliente</h1>
+      <h1 className="mb-4 page-title">{isEditMode ? 'Editar Cliente' : 'Adicionar Cliente'}</h1>
       <Form onSubmit={handleSubmit}>
         <MainArea formData={formData} handleChange={handleChange} errors={errors} />
         <PersonalInfoArea formData={formData} handleChange={handleChange} errors={errors} />
         <ClientStatusArea formData={formData} handleChange={handleChange} />
         <PasswordArea formData={formData} handleChange={handleChange} errors={errors} />
         <div className="button-group mt-4">
-            <Button type="submit" variant="primary">Adicionar Cliente</Button>
-            <Button type="button" variant="secondary" onClick={handleClear} className="ml-3">Limpar</Button>
+          <Button type="submit" variant="primary">{isEditMode ? 'Salvar Alterações' : 'Adicionar Cliente'}</Button>
+          <Button type="button" variant="secondary" onClick={handleClear} className="ml-3">Limpar</Button>
         </div>
         {errors.email && <div className="alert alert-danger mt-3">{errors.email}</div>}
         {errors.cpfCnpj && <div className="alert alert-danger mt-3">{errors.cpfCnpj}</div>}
