@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { formatPhoneNumber, formatDate } from '../utils/formatters';
 import BlockUnblockModal from './BlockUnblockModal';
 import { editClient } from '../services/clientService';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, setClientIdToDelete, setClientNameToDelete, setShowModal, fetchClientsList }) {
   const [showBlockUnblockModal, setShowBlockUnblockModal] = useState(false);
@@ -70,18 +71,24 @@ function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, 
                 />
               </td>
               <td>
-                <Link to={`/edit-client/${client.id}`} className="btn btn-secondary mr-2">
-                  <i className="bi bi-pencil"></i>
+                <Link 
+                  to={`/edit-client/${client.id}`} 
+                  className="p-0" 
+                  style={{ color: '#007bff', marginRight: '1rem' }}
+                >
+                  <FaEdit size={20} />
                 </Link>
                 <Button 
-                  variant="danger" 
+                  variant="link" 
                   onClick={() => { 
                     setClientIdToDelete(client.id); 
                     setClientNameToDelete(client.name);
                     setShowModal(true); 
                   }}
+                  className="p-0"
+                  style={{ color: '#6c757d' }}
                 >
-                  <i className="bi bi-trash"></i>
+                  <FaTrash size={20} />
                 </Button>
               </td>
             </tr>

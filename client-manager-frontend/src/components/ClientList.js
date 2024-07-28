@@ -103,13 +103,13 @@ function ClientList() {
             variant="link" 
             onClick={handleFilterToggle} 
             className="p-0" 
-            style={{ boxShadow: 'none', marginLeft: '1.5rem' }} // Aumenta o espaçamento e remove a borda
+            style={{ boxShadow: 'none', marginLeft: '1.5rem' }}
           >
-            <FaFilter size={20} style={{ color: '#6c757d' }} /> {/* Cor cinza mais suave */}
+            <FaFilter size={20} style={{ color: '#6c757d' }} /> {}
           </Button>
         </Col>
         <Col className="d-flex justify-content-end">
-          <Link to="/add-client" className="btn btn-primary">Adicionar Cliente</Link>
+          <Link to="/add-client" className="btn btn-primary">+ Adicionar Cliente</Link>
         </Col>
       </Row>
       {showFilter && (
