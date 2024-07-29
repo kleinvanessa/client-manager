@@ -42,7 +42,7 @@ dotnet restore
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=SEU_SERVIDOR;Database=ClientManager;Trusted_Connection=True;"
+  "DefaultConnection": "Server=YOUR_SERVER;Database=ClientManager;Trusted_Connection=True;"
 }
 ```
 
