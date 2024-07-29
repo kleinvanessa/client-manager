@@ -68,7 +68,7 @@ const PersonalInfoArea = ({ formData, handleChange, errors }) => {
           value={formData.cpfCnpj || ''}
           onChange={handleChange}
           guide={false}
-          placeholder={formData.personType === '1' ? '000.000.000-00' : '00.000.000/0001-00'}
+          placeholder={formData.personType === '1' ? '000.000.000-00' : (formData.personType === '2' ? '00.000.000/0001-00' : '')}
           type="text"
           maxLength={formData.personType === '1' ? 14 : 18}
           required
