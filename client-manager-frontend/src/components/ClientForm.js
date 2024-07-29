@@ -152,7 +152,9 @@ function ClientForm() {
         <PasswordArea formData={formData} handleChange={handleChange} errors={errors} />
         <div className="button-group mt-4">
           <Button type="submit" variant="primary">{isEditMode ? 'Salvar Alterações' : 'Adicionar Cliente'}</Button>
-          <Button type="button" variant="secondary" onClick={handleClear} className="ml-3">Limpar</Button>
+          {!isEditMode && (
+            <Button type="button" variant="secondary" onClick={handleClear} className="ml-3">Limpar</Button>
+          )}
         </div>
         {errors.email && <div className="alert alert-danger mt-3">{errors.email}</div>}
         {errors.cpfCnpj && <div className="alert alert-danger mt-3">{errors.cpfCnpj}</div>}

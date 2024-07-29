@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchClients, removeClient } from '../services/clientService';
-import { Container, Row, Col, Button, Form, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Container, Row, Col, Button, Form, Dropdown, DropdownButton, Spinner } from 'react-bootstrap';
 import { FaFilter } from 'react-icons/fa';
 import DeleteModal from './DeleteModal';
 import ClientTable from './ClientTable';
@@ -19,14 +19,22 @@ function ClientList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchClientsList();
   }, []);
 
   const fetchClientsList = async () => {
-    const data = await fetchClients();
-    setClients(data);
+    setLoading(true);
+    try {
+      const data = await fetchClients();
+      setClients(data);
+    } catch (error) {
+      console.error('Erro ao buscar clientes:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSelectAll = (e) => {
@@ -93,66 +101,93 @@ function ClientList() {
       </Row>
       <Row className="mb-3">
         <Col className="d-flex justify-content-start align-items-center">
-          <DropdownButton id="dropdown-basic-button" title="Ordenar" className="mr-3">
-            <Dropdown.Item onClick={() => handleSort('name', 'asc')}>Nome (A-Z)</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleSort('name', 'desc')}>Nome (Z-A)</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleSort('registrationDate', 'asc')}>Data de Cadastro (Crescente)</Dropdown.Item>
-            <Dropdown.Item onClick={() => handleSort('registrationDate', 'desc')}>Data de Cadastro (Decrescente)</Dropdown.Item>
-          </DropdownButton>
-          <Button 
-            variant="link" 
-            onClick={handleFilterToggle} 
-            className="p-0" 
-            style={{ boxShadow: 'none', marginLeft: '1.5rem' }}
-          >
-            <FaFilter size={20} style={{ color: '#6c757d' }} /> {}
-          </Button>
+          {clients.length > 0 && (
+            <>
+              <DropdownButton id="dropdown-basic-button" title="Ordenar" className="mr-3">
+                <Dropdown.Item onClick={() => handleSort('name', 'asc')}>Nome (A-Z)</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleSort('name', 'desc')}>Nome (Z-A)</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleSort('registrationDate', 'asc')}>Data de Cadastro (Crescente)</Dropdown.Item>
+                <Dropdown.Item onClick={() => handleSort('registrationDate', 'desc')}>Data de Cadastro (Decrescente)</Dropdown.Item>
+              </DropdownButton>
+              <Button 
+                variant="link" 
+                onClick={handleFilterToggle} 
+                className="p-0" 
+                style={{ boxShadow: 'none', marginLeft: '1.5rem' }}
+              >
+                <FaFilter size={20} style={{ color: '#6c757d' }} /> {}
+              </Button>
+            </>
+          )}
         </Col>
         <Col className="d-flex justify-content-end">
           <Link to="/add-client" className="btn btn-primary">+ Adicionar Cliente</Link>
         </Col>
       </Row>
-      {showFilter && (
-        <Row className="mb-3">
+      {loading ? (
+        <Row className="text-center">
           <Col>
-            <Form>
-              <Form.Group controlId="formSearch">
-                <Form.Label>Pesquisar Clientes</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  placeholder="Pesquisar por nome ou email" 
-                  value={searchTerm} 
-                  onChange={handleSearchChange} 
-                />
-              </Form.Group>
-            </Form>
+            <Spinner animation="border" role="status" style={{ margin: 'auto', display: 'block' }}>
+              <span className="visually-hidden">Carregando...</span>
+            </Spinner>
           </Col>
         </Row>
+      ) : (
+        <>
+          {clients.length === 0 ? (
+            <Row className="text-center">
+              <Col>
+                <img src="/empty.svg" alt="Nenhum cliente encontrado" style={{ maxWidth: '300px', margin: '20px auto' }} />
+                <h3 style={{ color: 'blue' }}>Nenhum cliente encontrado</h3>
+              </Col>
+            </Row>
+          ) : (
+            <>
+              {showFilter && (
+                <Row className="mb-3">
+                  <Col>
+                    <Form>
+                      <Form.Group controlId="formSearch">
+                        <Form.Label>Pesquisar Clientes</Form.Label>
+                        <Form.Control 
+                          type="text" 
+                          placeholder="Pesquisar por nome ou email" 
+                          value={searchTerm} 
+                          onChange={handleSearchChange} 
+                        />
+                      </Form.Group>
+                    </Form>
+                  </Col>
+                </Row>
+              )}
+              <Row>
+                <Col>
+                  <ClientTable
+                    clients={currentClients}
+                    selectedClients={selectedClients}
+                    handleSelect={handleSelect}
+                    handleSelectAll={handleSelectAll}
+                    setClientIdToDelete={(id, name) => { setClientIdToDelete(id); setClientNameToDelete(name); }}
+                    setShowModal={setShowModal}
+                    setClientNameToDelete={setClientNameToDelete}
+                    fetchClientsList={fetchClientsList}
+                  />
+                </Col>
+              </Row>
+              <Row className="mt-3">
+                <Col className="d-flex justify-content-center">
+                  <PaginationComponent
+                    totalClients={filteredClients.length}
+                    clientsPerPage={clientsPerPage}
+                    currentPage={currentPage}
+                    paginate={paginate}
+                  />
+                </Col>
+              </Row>
+            </>
+          )}
+        </>
       )}
-      <Row>
-        <Col>
-          <ClientTable
-            clients={currentClients}
-            selectedClients={selectedClients}
-            handleSelect={handleSelect}
-            handleSelectAll={handleSelectAll}
-            setClientIdToDelete={(id, name) => { setClientIdToDelete(id); setClientNameToDelete(name); }}
-            setShowModal={setShowModal}
-            setClientNameToDelete={setClientNameToDelete}
-            fetchClientsList={fetchClientsList}
-          />
-        </Col>
-      </Row>
-      <Row className="mt-3">
-        <Col className="d-flex justify-content-center">
-          <PaginationComponent
-            totalClients={filteredClients.length}
-            clientsPerPage={clientsPerPage}
-            currentPage={currentPage}
-            paginate={paginate}
-          />
-        </Col>
-      </Row>
       <DeleteModal 
         show={showModal} 
         onHide={() => setShowModal(false)} 
