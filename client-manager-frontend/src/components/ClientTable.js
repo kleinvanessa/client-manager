@@ -6,7 +6,7 @@ import BlockUnblockModal from './BlockUnblockModal';
 import { editClient } from '../services/clientService';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
-function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, setClientIdToDelete, setClientNameToDelete, setShowModal, fetchClientsList }) {
+function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, setClientIdToDelete, setClientNameToDelete, setShowModal, fetchClientsList, currentPage, clientsPerPage }) {
   const [showBlockUnblockModal, setShowBlockUnblockModal] = useState(false);
   const [clientIdToBlockUnblock, setClientIdToBlockUnblock] = useState(null);
   const [clientNameToBlockUnblock, setClientNameToBlockUnblock] = useState('');
@@ -54,51 +54,54 @@ function ClientTable({ clients, selectedClients, handleSelect, handleSelectAll, 
           </tr>
         </thead>
         <tbody>
-          {clients.map((client, index) => (
-            <tr key={client.id}>
-              <td>{index + 1}</td>
-              <td>
-                <input 
-                  type="checkbox" 
-                  checked={selectedClients.includes(client.id)} 
-                  onChange={(e) => handleSelect(e, client.id)} 
-                />
-              </td>
-              <td>{client.name}</td>
-              <td>{client.email}</td>
-              <td>{formatPhoneNumber(client.phone)}</td>
-              <td>{formatDate(client.registrationDate)}</td>
-              <td>
-                <input 
-                  type="checkbox" 
-                  checked={client.isBlocked} 
-                  onChange={() => handleBlockUnblock(client)}
-                />
-              </td>
-              <td>
-                <Button 
-                  variant="link" 
-                  onClick={() => handleEdit(client)} 
-                  className="p-0" 
-                  style={{ color: '#007bff', marginRight: '1rem' }}
-                >
-                  <FaEdit size={20} />
-                </Button>
-                <Button 
-                  variant="link" 
-                  onClick={() => { 
-                    setClientIdToDelete(client.id); 
-                    setClientNameToDelete(client.name);
-                    setShowModal(true); 
-                  }}
-                  className="p-0"
-                  style={{ color: '#6c757d' }}
-                >
-                  <FaTrash size={20} />
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {clients.map((client, index) => {
+            const displayIndex = (currentPage - 1) * clientsPerPage + index + 1;
+            return (
+              <tr key={client.id}>
+                <td>{displayIndex}</td>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedClients.includes(client.id)} 
+                    onChange={(e) => handleSelect(e, client.id)} 
+                  />
+                </td>
+                <td>{client.name}</td>
+                <td>{client.email}</td>
+                <td>{formatPhoneNumber(client.phone)}</td>
+                <td>{formatDate(client.registrationDate)}</td>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    checked={client.isBlocked} 
+                    onChange={() => handleBlockUnblock(client)}
+                  />
+                </td>
+                <td>
+                  <Button 
+                    variant="link" 
+                    onClick={() => handleEdit(client)} 
+                    className="p-0" 
+                    style={{ color: '#007bff', marginRight: '1rem' }}
+                  >
+                    <FaEdit size={20} />
+                  </Button>
+                  <Button 
+                    variant="link" 
+                    onClick={() => { 
+                      setClientIdToDelete(client.id); 
+                      setClientNameToDelete(client.name);
+                      setShowModal(true); 
+                    }}
+                    className="p-0"
+                    style={{ color: '#6c757d' }}
+                  >
+                    <FaTrash size={20} />
+                  </Button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
       <BlockUnblockModal
