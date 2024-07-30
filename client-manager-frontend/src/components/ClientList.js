@@ -171,6 +171,8 @@ function ClientList() {
                     setShowModal={setShowModal}
                     setClientNameToDelete={setClientNameToDelete}
                     fetchClientsList={fetchClientsList}
+                    currentPage={currentPage}
+                    clientsPerPage={clientsPerPage}
                   />
                 </Col>
               </Row>
